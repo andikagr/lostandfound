@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1010 490" width="1010" height="490">
+  <!--
+    cariU Logo — versi putih (untuk background merah)
+  -->
+
+  <!-- Handle kaca pembesar -->
+  <line x1="245" y1="346" x2="52" y2="472"
+        stroke="white" stroke-width="54" stroke-linecap="round"/>
+
+  <!-- Ring "c" -->
+  <path d="M 255 108 A 130 130 0 1 0 255 322"
+        stroke="white" stroke-width="70" fill="none" stroke-linecap="round"/>
+
+  <!-- Glare (warna merah transparan agar terlihat di atas putih) -->
+  <path d="M 107 157 Q 129 130 158 143"
+        stroke="rgba(227,24,55,0.55)" stroke-width="15" fill="none" stroke-linecap="round"/>
+
+  <!-- Teks "ariU" bold rounded -->
+  <text x="348" y="390"
+        font-family="'Arial Black', 'Poppins', 'Helvetica Neue', Arial, sans-serif"
+        font-weight="900" font-size="298" fill="white" letter-spacing="-3">ariU</text>
+</svg>

@@ -7,9 +7,11 @@ use App\Http\Controllers\FormFoundItemController;
 use App\Http\Controllers\ClaimController;
 use App\Http\Controllers\HistoryController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\NotificationController;
 
 Route::get('/', function () {
-    return redirect('/found-items');
+    return view('landing');
 });
 
 Route::middleware('guest')->group(function () {
@@ -25,6 +27,9 @@ Route::post('/logout', [AuthController::class, 'logout'])
     ->name('logout');
 
 Route::middleware('auth')->group(function () {
+
+    // Dashboard
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::resource('lost-items', LostItemController::class);
     Route::get('found-items/print', [FoundItemController::class, 'print'])->name('found-items.print');
@@ -56,4 +61,8 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/riwayat', [HistoryController::class, 'index'])
         ->name('riwayat.index');
+
+    // Notifications
+    Route::get('/notifications/{id}/read', [NotificationController::class, 'read'])->name('notifications.read');
+    Route::get('/notifications/read-all', [NotificationController::class, 'readAll'])->name('notifications.read-all');
 });

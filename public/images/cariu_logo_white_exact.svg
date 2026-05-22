@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 180" width="480" height="180">
+  <!-- Magnifying glass (the "c") -->
+  <circle cx="78" cy="42" r="26" stroke="white" stroke-width="11" fill="none"/>
+  <line x1="58" y1="62" x2="18" y2="155" stroke="white" stroke-width="11" stroke-linecap="round"/>
+  <path d="M66 28 C70 22, 74 24, 71 34" stroke="#e31837" stroke-width="5.5" fill="none" stroke-linecap="round"/>
+  <!-- Text "ariU" -->
+  <text x="114" y="148" font-family="Montserrat, 'Arial Black', sans-serif" font-weight="900" font-size="120" fill="white" letter-spacing="-3">ariU</text>
+</svg>

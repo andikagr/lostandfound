@@ -58,7 +58,7 @@ class LostFoundController extends Controller
 
     public function indexLostItems()
     {
-        $items = LostItem::with('status', 'user')->latest()->get();
+        $items = LostItem::doesntHave('claims')->with('status', 'user')->latest()->get();
 
         return response()->json([
             'message' => 'List data lost items',
@@ -85,7 +85,7 @@ class LostFoundController extends Controller
         $lostItem = LostItem::find($id);
 
         if (!$lostItem) return response()->json(['message' => 'Data tidak ditemukan'], 404);
-        if ($lostItem->user_id !== $request->user()->id) return response()->json(['message' => 'Unauthorized'], 403);
+        if ($request->user()->role !== 'admin') return response()->json(['message' => 'Unauthorized: Hanya admin yang dapat mengubah data'], 403);
 
         $validator = Validator::make($request->all(), [
             'nama_barang' => 'sometimes|required|string|max:255',
@@ -117,7 +117,7 @@ class LostFoundController extends Controller
         $lostItem = LostItem::find($id);
 
         if (!$lostItem) return response()->json(['message' => 'Data tidak ditemukan'], 404);
-        if ($lostItem->user_id !== $request->user()->id) return response()->json(['message' => 'Unauthorized'], 403);
+        if ($request->user()->role !== 'admin') return response()->json(['message' => 'Unauthorized: Hanya admin yang dapat menghapus data'], 403);
 
         if ($lostItem->image) Storage::disk('public')->delete($lostItem->image);
         $lostItem->delete();
@@ -165,7 +165,7 @@ class LostFoundController extends Controller
 
     public function indexFoundItems()
     {
-        $items = FoundItem::latest()->get();
+        $items = FoundItem::doesntHave('claims')->latest()->get();
 
         return response()->json([
             'message' => 'List Data Found Items',
@@ -263,7 +263,7 @@ class LostFoundController extends Controller
         $claim = Claim::find($id);
 
         if (!$claim) return response()->json(['message' => 'Claim tidak ditemukan'], 404);
-        if ($claim->user_id !== $request->user()->id) return response()->json(['message' => 'Forbidden'], 403);
+        if ($request->user()->role !== 'admin') return response()->json(['message' => 'Forbidden: Hanya admin yang dapat mengubah riwayat'], 403);
 
         $validator = Validator::make($request->all(), [
             'nama_pemilik' => 'required|string',
@@ -294,7 +294,7 @@ class LostFoundController extends Controller
         $claim = Claim::find($id);
 
         if (!$claim) return response()->json(['message' => 'Claim tidak ditemukan'], 404);
-        if ($claim->user_id !== $request->user()->id) return response()->json(['message' => 'Forbidden'], 403);
+        if ($request->user()->role !== 'admin') return response()->json(['message' => 'Forbidden: Hanya admin yang dapat menghapus riwayat'], 403);
 
         if ($claim->bukti) Storage::disk('public')->delete($claim->bukti);
         $claim->delete();
@@ -308,15 +308,21 @@ class LostFoundController extends Controller
 
     public function history(Request $request)
     {
-        $userId = $request->user()->id;
+        $user = $request->user();
+
+        $lostItemsQuery = LostItem::latest();
+        $claimsQuery = Claim::with(['foundItem', 'lostItem'])->latest();
+
+        if ($user->role !== 'admin') {
+            $lostItemsQuery->where('user_id', $user->id);
+            $claimsQuery->where('user_id', $user->id);
+        }
 
         return response()->json([
             'message' => 'Riwayat Aktivitas',
             'data' => [
-                'laporan_kehilangan' => LostItemResource::collection(
-                    LostItem::where('user_id', $userId)->latest()->get()
-                ),
-                'riwayat_klaim' => Claim::where('user_id', $userId)->with(['foundItem', 'lostItem'])->latest()->get()
+                'laporan_kehilangan' => LostItemResource::collection($lostItemsQuery->get()),
+                'riwayat_klaim' => $claimsQuery->get()
             ]
         ], 200);
     }

@@ -8,18 +8,27 @@ use App\Models\Category;
 use App\Models\Status;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Gate;
 
 class ItemHistoryController extends Controller
 {
     public function index()
     {
-        $items = LostItem::with('location', 'category', 'status')->get();
+        if (auth()->check() && auth()->user()->role === 'admin') {
+            $items = LostItem::with('location', 'category', 'status')->get();
+        } else {
+            $items = LostItem::doesntHave('claims')->with('location', 'category', 'status')->get();
+        }
         return view('lost_items.index', compact('items'));
     }
 
     public function riwayat(Request $request)
     {
-        $query = LostItem::with('location', 'category', 'status');
+        if (auth()->user()->role === 'admin') {
+            $query = LostItem::has('claims')->with('location', 'category', 'status');
+        } else {
+            $query = LostItem::where('user_id', auth()->id())->has('claims')->with('location', 'category', 'status');
+        }
 
         if ($request->filled('search')) {
             $query->where('nama_barang', 'like', '%' . $request->search . '%');
@@ -61,6 +70,8 @@ class ItemHistoryController extends Controller
             'image'          => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
         ]);
 
+        $validated['user_id'] = auth()->id();
+
         if ($request->hasFile('image')) {
             $validated['image'] = $request->file('image')->store('lost_items', 'public');
         }
@@ -74,6 +85,8 @@ class ItemHistoryController extends Controller
 
     public function update(Request $request, $id)
     {
+        Gate::authorize('admin-only');
+
         $item = LostItem::findOrFail($id);
 
         $validated = $request->validate([
@@ -103,6 +116,8 @@ class ItemHistoryController extends Controller
 
     public function destroy($id)
     {
+        Gate::authorize('admin-only');
+
         $item = LostItem::findOrFail($id);
 
         if ($item->image) {

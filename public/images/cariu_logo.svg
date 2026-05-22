@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1010 490" width="1010" height="490">
+  <!--
+    cariU Logo — versi merah
+    "c" = arc tebal (stroke-linecap="round") yang membentuk huruf c kaca pembesar
+    Center of arc: ~(181, 215), radius: 130, stroke-width: 70
+    Opening angle: ~110 derajat di sisi kanan
+  -->
+
+  <!-- Handle kaca pembesar (batang diagonal ke kiri-bawah) -->
+  <line x1="245" y1="346" x2="52" y2="472"
+        stroke="#e31837" stroke-width="54" stroke-linecap="round"/>
+
+  <!-- Ring "c" — arc tebal dengan ujung rounded (membentuk huruf c) -->
+  <path d="M 255 108 A 130 130 0 1 0 255 322"
+        stroke="#e31837" stroke-width="70" fill="none" stroke-linecap="round"/>
+
+  <!-- Glare putih di dalam lensa (kiri atas) -->
+  <path d="M 107 157 Q 129 130 158 143"
+        stroke="white" stroke-width="15" fill="none" stroke-linecap="round"/>
+
+  <!-- Teks "ariU" bold rounded -->
+  <text x="348" y="390"
+        font-family="'Arial Black', 'Poppins', 'Helvetica Neue', Arial, sans-serif"
+        font-weight="900" font-size="298" fill="#e31837" letter-spacing="-3">ariU</text>
+</svg>

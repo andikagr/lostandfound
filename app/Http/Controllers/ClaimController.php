@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Claim;
 use App\Models\FoundItem;
 use App\Models\LostItem;
+use App\Models\Notification;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -41,7 +43,44 @@ class ClaimController extends Controller
             $data['bukti'] = $request->file('bukti')->store('claim-bukti', 'public');
         }
 
-        Claim::create($data);
+        $claim = Claim::create($data);
+
+        // Send notifications
+        $itemName = '';
+        $itemOwnerId = null;
+
+        if (isset($data['found_item_id'])) {
+            $foundItem = FoundItem::find($data['found_item_id']);
+            $itemName = $foundItem->nama_barang ?? 'Barang';
+            $itemOwnerId = $foundItem->user_id;
+        } elseif (isset($data['lost_item_id'])) {
+            $lostItem = LostItem::find($data['lost_item_id']);
+            $itemName = $lostItem->nama_barang ?? 'Barang';
+            $itemOwnerId = $lostItem->user_id;
+        }
+
+        // Notify item owner (if different from claimer)
+        if ($itemOwnerId && $itemOwnerId !== Auth::id()) {
+            Notification::send(
+                $itemOwnerId,
+                'claim_new',
+                'Klaim Baru!',
+                Auth::user()->name . ' mengajukan klaim untuk "' . $itemName . '"',
+                route('riwayat.index')
+            );
+        }
+
+        // Notify all admins
+        $admins = User::where('role', 'admin')->where('id', '!=', Auth::id())->get();
+        foreach ($admins as $admin) {
+            Notification::send(
+                $admin->id,
+                'claim_new',
+                'Klaim Baru Masuk',
+                Auth::user()->name . ' mengklaim "' . $itemName . '"',
+                route('riwayat.index')
+            );
+        }
 
         return redirect()
             ->route('riwayat.index')
@@ -50,8 +89,8 @@ class ClaimController extends Controller
 
     public function edit(Claim $claim)
     {
-        // Pastikan hanya pemilik claim yang bisa edit
-        if ($claim->user_id !== Auth::id()) {
+        // Hanya admin yang bisa edit di riwayat
+        if (Auth::user()->role !== 'admin') {
             abort(403);
         }
 
@@ -63,7 +102,7 @@ class ClaimController extends Controller
 
     public function update(Request $request, Claim $claim)
     {
-        if ($claim->user_id !== Auth::id()) {
+        if (Auth::user()->role !== 'admin') {
             abort(403);
         }
 
@@ -91,7 +130,7 @@ class ClaimController extends Controller
 
     public function destroy(Claim $claim)
     {
-        if ($claim->user_id !== Auth::id()) {
+        if (Auth::user()->role !== 'admin') {
             abort(403);
         }
 
