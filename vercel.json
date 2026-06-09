@@ -29,7 +29,7 @@
         },
         {
             "src": "/favicon.ico",
-            "dest": "/public/favicon.png"
+            "dest": "/public/favicon.ico"
         },
         {
             "src": "/(.*)",
