@@ -3,12 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Models\LostItem;
+use App\Services\SupabaseStorageService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 
 class LostItemController extends Controller
 {
+    protected SupabaseStorageService $storage;
+
+    public function __construct(SupabaseStorageService $storage)
+    {
+        $this->storage = $storage;
+    }
+
     public function index(Request $request)
     {
         $query = LostItem::query();
@@ -17,22 +24,15 @@ class LostItemController extends Controller
             $query->doesntHave('claims');
         }
 
-        // Search by name
         if ($request->filled('search')) {
             $query->where('nama_barang', 'like', '%' . $request->search . '%');
         }
-
-        // Filter by category
         if ($request->filled('kategori')) {
             $query->where('kategori', $request->kategori);
         }
-
-        // Filter by location
         if ($request->filled('lokasi')) {
             $query->where('lokasi_terakhir', 'like', '%' . $request->lokasi . '%');
         }
-
-        // Filter by date
         if ($request->filled('tanggal_dari')) {
             $query->whereDate('tanggal_hilang', '>=', $request->tanggal_dari);
         }
@@ -41,8 +41,6 @@ class LostItemController extends Controller
         }
 
         $items = $query->latest()->get();
-
-        // Get unique categories and locations for filter dropdowns
         $categories = LostItem::whereNotNull('kategori')->distinct()->pluck('kategori');
         $locations = LostItem::whereNotNull('lokasi_terakhir')->distinct()->pluck('lokasi_terakhir');
 
@@ -57,22 +55,23 @@ class LostItemController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'nama_barang' => 'required|string',
+            'nama_barang'    => 'required|string',
             'tanggal_hilang' => 'required|date',
-            'kategori' => 'required|string',
-            'kontak' => 'required|string',
-            'lokasi_terakhir' => 'required|string',
-            'deskripsi' => 'required|string',
-            'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'kategori'       => 'required|string',
+            'kontak'         => 'required|string',
+            'lokasi_terakhir'=> 'required|string',
+            'deskripsi'      => 'required|string',
+            'image'          => 'nullable|image|mimes:jpg,jpeg,png|max:1024',
         ]);
 
         $data['status_id'] = 1;
-        $data['user_id'] = Auth::id();
+        $data['user_id']   = Auth::id();
 
         if ($request->hasFile('image')) {
-            $file = $request->file('image');
-            $base64 = 'data:' . $file->getMimeType() . ';base64,' . base64_encode(file_get_contents($file->getRealPath()));
-            $data['image'] = $base64;
+            $url = $this->storage->upload($request->file('image'), 'lost-items');
+            if ($url) {
+                $data['image'] = $url;
+            }
         }
 
         LostItem::create($data);
@@ -91,37 +90,38 @@ class LostItemController extends Controller
     public function edit($id)
     {
         $item = LostItem::findOrFail($id);
-
         if (auth()->user()->role !== 'admin') {
             abort(403, 'Anda tidak punya akses');
         }
-
         return view('lost_items.edit', compact('item'));
     }
 
     public function update(Request $request, $id)
     {
         $item = LostItem::findOrFail($id);
-
         if (auth()->user()->role !== 'admin') {
             abort(403, 'Anda tidak punya akses');
         }
 
         $data = $request->validate([
-            'nama_barang' => 'required|string',
-            'kategori' => 'required|string',
-            'lokasi_terakhir' => 'required|string',
+            'nama_barang'    => 'required|string',
+            'kategori'       => 'required|string',
+            'lokasi_terakhir'=> 'required|string',
             'tanggal_hilang' => 'required|date',
-            'kontak' => 'required|string',
-            'deskripsi' => 'required|string',
-            'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-            'status_id' => 'nullable|integer',
+            'kontak'         => 'required|string',
+            'deskripsi'      => 'required|string',
+            'image'          => 'nullable|image|mimes:jpg,jpeg,png|max:1024',
+            'status_id'      => 'nullable|integer',
         ]);
 
         if ($request->hasFile('image')) {
-            $file = $request->file('image');
-            $base64 = 'data:' . $file->getMimeType() . ';base64,' . base64_encode(file_get_contents($file->getRealPath()));
-            $data['image'] = $base64;
+            if ($item->image) {
+                $this->storage->delete($item->image);
+            }
+            $url = $this->storage->upload($request->file('image'), 'lost-items');
+            if ($url) {
+                $data['image'] = $url;
+            }
         }
 
         $item->update($data);
@@ -134,11 +134,12 @@ class LostItemController extends Controller
     public function destroy($id)
     {
         $item = LostItem::findOrFail($id);
-
         if (auth()->user()->role !== 'admin') {
             abort(403, 'Anda tidak punya akses');
         }
-
+        if ($item->image) {
+            $this->storage->delete($item->image);
+        }
         $item->delete();
 
         return redirect()

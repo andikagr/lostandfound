@@ -3,13 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Models\FoundItem;
+use App\Services\SupabaseStorageService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Auth;
 
 class FoundItemController extends Controller
 {
+    protected SupabaseStorageService $storage;
+
+    public function __construct(SupabaseStorageService $storage)
+    {
+        $this->storage = $storage;
+    }
+
     public function index(Request $request)
     {
         $query = FoundItem::query();
@@ -18,22 +25,15 @@ class FoundItemController extends Controller
             $query->doesntHave('claims');
         }
 
-        // Search by name
         if ($request->filled('search')) {
             $query->where('nama_barang', 'like', '%' . $request->search . '%');
         }
-
-        // Filter by category
         if ($request->filled('kategori')) {
             $query->where('kategori', $request->kategori);
         }
-
-        // Filter by location
         if ($request->filled('lokasi')) {
             $query->where('lokasi_penemuan', 'like', '%' . $request->lokasi . '%');
         }
-
-        // Filter by date
         if ($request->filled('tanggal_dari')) {
             $query->whereDate('tanggal_ditemukan', '>=', $request->tanggal_dari);
         }
@@ -42,8 +42,6 @@ class FoundItemController extends Controller
         }
 
         $items = $query->latest()->get();
-
-        // Get unique categories and locations for filter dropdowns
         $categories = FoundItem::whereNotNull('kategori')->distinct()->pluck('kategori');
         $locations = FoundItem::whereNotNull('lokasi_penemuan')->distinct()->pluck('lokasi_penemuan');
 
@@ -66,7 +64,6 @@ class FoundItemController extends Controller
     {
         Gate::authorize('admin-only');
         $item = FoundItem::findOrFail($id);
-
         return view('found_items.edit', compact('item'));
     }
 
@@ -76,25 +73,29 @@ class FoundItemController extends Controller
         $item = FoundItem::findOrFail($id);
 
         $data = $request->validate([
-            'nama_barang' => 'required|string|max:255',
-            'kategori' => 'nullable|string|max:255',
-            'lokasi' => 'nullable|string|max:255',
+            'nama_barang'     => 'required|string|max:255',
+            'kategori'        => 'nullable|string|max:255',
+            'lokasi'          => 'nullable|string|max:255',
             'tanggal_ditemukan' => 'nullable|date',
             'waktu_ditemukan' => 'nullable',
             'lokasi_penemuan' => 'nullable|string|max:255',
-            'kronologi' => 'nullable|string',
-            'nama_penemu' => 'nullable|string|max:255',
-            'kontak_penemu' => 'nullable|string|max:255',
-            'alamat_penemu' => 'nullable|string|max:255',
-            'kontak' => 'nullable|string|max:255',
-            'deskripsi' => 'nullable|string',
-            'image' => 'nullable|image|max:2048',
+            'kronologi'       => 'nullable|string',
+            'nama_penemu'     => 'nullable|string|max:255',
+            'kontak_penemu'   => 'nullable|string|max:255',
+            'alamat_penemu'   => 'nullable|string|max:255',
+            'kontak'          => 'nullable|string|max:255',
+            'deskripsi'       => 'nullable|string',
+            'image'           => 'nullable|image|max:1024',
         ]);
 
         if ($request->hasFile('image')) {
-            $file = $request->file('image');
-            $base64 = 'data:' . $file->getMimeType() . ';base64,' . base64_encode(file_get_contents($file->getRealPath()));
-            $data['image'] = $base64;
+            if ($item->image) {
+                $this->storage->delete($item->image);
+            }
+            $url = $this->storage->upload($request->file('image'), 'found-items');
+            if ($url) {
+                $data['image'] = $url;
+            }
         }
 
         $item->update($data);
@@ -106,7 +107,9 @@ class FoundItemController extends Controller
     {
         Gate::authorize('admin-only');
         $item = FoundItem::findOrFail($id);
-
+        if ($item->image) {
+            $this->storage->delete($item->image);
+        }
         $item->delete();
 
         return redirect()->route('found-items.index')->with('success', 'Data berhasil dihapus');
