@@ -70,7 +70,9 @@ class LostItemController extends Controller
         $data['user_id'] = Auth::id();
 
         if ($request->hasFile('image')) {
-            $data['image'] = $request->file('image')->store('lost-items', 'public');
+            $file = $request->file('image');
+            $base64 = 'data:' . $file->getMimeType() . ';base64,' . base64_encode(file_get_contents($file->getRealPath()));
+            $data['image'] = $base64;
         }
 
         LostItem::create($data);
@@ -117,10 +119,9 @@ class LostItemController extends Controller
         ]);
 
         if ($request->hasFile('image')) {
-            if ($item->image) {
-                Storage::disk('public')->delete($item->image);
-            }
-            $data['image'] = $request->file('image')->store('lost-items', 'public');
+            $file = $request->file('image');
+            $base64 = 'data:' . $file->getMimeType() . ';base64,' . base64_encode(file_get_contents($file->getRealPath()));
+            $data['image'] = $base64;
         }
 
         $item->update($data);
@@ -136,10 +137,6 @@ class LostItemController extends Controller
 
         if (auth()->user()->role !== 'admin') {
             abort(403, 'Anda tidak punya akses');
-        }
-
-        if ($item->image) {
-            Storage::disk('public')->delete($item->image);
         }
 
         $item->delete();

@@ -92,10 +92,9 @@ class FoundItemController extends Controller
         ]);
 
         if ($request->hasFile('image')) {
-            if ($item->image) {
-                Storage::disk('public')->delete($item->image);
-            }
-            $data['image'] = $request->file('image')->store('found-items', 'public');
+            $file = $request->file('image');
+            $base64 = 'data:' . $file->getMimeType() . ';base64,' . base64_encode(file_get_contents($file->getRealPath()));
+            $data['image'] = $base64;
         }
 
         $item->update($data);
@@ -107,10 +106,6 @@ class FoundItemController extends Controller
     {
         Gate::authorize('admin-only');
         $item = FoundItem::findOrFail($id);
-
-        if ($item->image) {
-            Storage::disk('public')->delete($item->image);
-        }
 
         $item->delete();
 
