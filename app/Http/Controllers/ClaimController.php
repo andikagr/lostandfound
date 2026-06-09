@@ -7,11 +7,19 @@ use App\Models\FoundItem;
 use App\Models\LostItem;
 use App\Models\Notification;
 use App\Models\User;
+use App\Services\SupabaseStorageService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class ClaimController extends Controller
 {
+    protected SupabaseStorageService $storage;
+
+    public function __construct(SupabaseStorageService $storage)
+    {
+        $this->storage = $storage;
+    }
+
     public function create($foundItemId)
     {
         $foundItem = FoundItem::findOrFail($foundItemId);
@@ -28,34 +36,37 @@ class ClaimController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'found_item_id' => 'nullable|exists:found_items,id|required_without:lost_item_id',
-            'lost_item_id' => 'nullable|exists:lost_items,id|required_without:found_item_id',
-            'nama_pemilik' => 'required|string|max:255',
-            'kontak_pemilik' => 'required|numeric',
-            'lokasi_terakhir' => 'required|string|max:255',
-            'bukti' => 'required|file|max:2048',
+            'found_item_id'  => 'nullable|exists:found_items,id|required_without:lost_item_id',
+            'lost_item_id'   => 'nullable|exists:lost_items,id|required_without:found_item_id',
+            'nama_pemilik'   => 'required|string|max:255',
+            'kontak_pemilik' => 'required|string|max:255',
+            'lokasi_terakhir'=> 'required|string|max:255',
+            'bukti'          => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048',
         ]);
 
         $data['user_id'] = Auth::id();
-        $data['status'] = 'diklaim';
+        $data['status']  = 'diklaim';
 
         if ($request->hasFile('bukti')) {
-            $data['bukti'] = $request->file('bukti')->store('claim-bukti', 'public');
+            $url = $this->storage->upload($request->file('bukti'), 'claim-bukti');
+            if ($url) {
+                $data['bukti'] = $url;
+            }
         }
 
         $claim = Claim::create($data);
 
         // Send notifications
-        $itemName = '';
+        $itemName    = '';
         $itemOwnerId = null;
 
         if (isset($data['found_item_id'])) {
-            $foundItem = FoundItem::find($data['found_item_id']);
-            $itemName = $foundItem->nama_barang ?? 'Barang';
+            $foundItem   = FoundItem::find($data['found_item_id']);
+            $itemName    = $foundItem->nama_barang ?? 'Barang';
             $itemOwnerId = $foundItem->user_id;
         } elseif (isset($data['lost_item_id'])) {
-            $lostItem = LostItem::find($data['lost_item_id']);
-            $itemName = $lostItem->nama_barang ?? 'Barang';
+            $lostItem    = LostItem::find($data['lost_item_id']);
+            $itemName    = $lostItem->nama_barang ?? 'Barang';
             $itemOwnerId = $lostItem->user_id;
         }
 
@@ -89,14 +100,10 @@ class ClaimController extends Controller
 
     public function edit(Claim $claim)
     {
-        // Hanya admin yang bisa edit di riwayat
         if (Auth::user()->role !== 'admin') {
             abort(403);
         }
-
-        // Ambil data item terkait untuk ditampilkan (readonly)
         $item = $claim->foundItem ?? $claim->lostItem;
-
         return view('riwayat.edit', compact('claim', 'item'));
     }
 
@@ -107,18 +114,20 @@ class ClaimController extends Controller
         }
 
         $data = $request->validate([
-            'nama_pemilik' => 'required|string|max:255',
-            'kontak_pemilik' => 'required|numeric',
-            'lokasi_terakhir' => 'required|string|max:255',
-            'bukti' => 'nullable|file|max:2048', // bukti boleh null kalau tidak diupdate
+            'nama_pemilik'   => 'required|string|max:255',
+            'kontak_pemilik' => 'required|string|max:255',
+            'lokasi_terakhir'=> 'required|string|max:255',
+            'bukti'          => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
         ]);
 
         if ($request->hasFile('bukti')) {
-            // Hapus bukti lama jika ada
             if ($claim->bukti) {
-                \Illuminate\Support\Facades\Storage::disk('public')->delete($claim->bukti);
+                $this->storage->delete($claim->bukti);
             }
-            $data['bukti'] = $request->file('bukti')->store('claim-bukti', 'public');
+            $url = $this->storage->upload($request->file('bukti'), 'claim-bukti');
+            if ($url) {
+                $data['bukti'] = $url;
+            }
         }
 
         $claim->update($data);
@@ -135,7 +144,7 @@ class ClaimController extends Controller
         }
 
         if ($claim->bukti) {
-            \Illuminate\Support\Facades\Storage::disk('public')->delete($claim->bukti);
+            $this->storage->delete($claim->bukti);
         }
 
         $claim->delete();
