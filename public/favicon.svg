@@ -1,9 +1,13 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="100%" height="100%">
   <!-- Handle kaca pembesar (batang diagonal ke kiri-bawah) -->
-  <line x1="67" y1="67" x2="18" y2="93"
-        stroke="#e31837" stroke-width="11" stroke-linecap="round"/>
+  <line x1="337" y1="310" x2="144" y2="436"
+        stroke="#e31837" stroke-width="54" stroke-linecap="round"/>
 
-  <!-- Ring "c" — arc tebal membentuk huruf c / kaca pembesar -->
-  <path d="M 72 20 A 30 30 0 1 0 72 75"
-        stroke="#e31837" stroke-width="14" fill="none" stroke-linecap="round"/>
+  <!-- Ring "c" — arc tebal dengan ujung rounded (membentuk huruf c) -->
+  <path d="M 347 72 A 130 130 0 1 0 347 286"
+        stroke="#e31837" stroke-width="70" fill="none" stroke-linecap="round"/>
+
+  <!-- Glare merah di dalam lensa (kiri atas) -->
+  <path d="M 199 121 Q 221 94 250 107"
+        stroke="#e31837" stroke-width="15" fill="none" stroke-linecap="round"/>
 </svg>
