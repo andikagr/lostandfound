@@ -22,14 +22,15 @@ class FormFoundItemController extends Controller
             'lokasi_penemuan' => 'required|string|max:255',
             'kronologi' => 'nullable|string',
             'nama_penemu' => 'required|string|max:255',
-            'kontak_penemu' => 'required|numeric',
+            'kontak_penemu' => 'required|string|max:255',
             'alamat_penemu' => 'required|string|max:255',
             'deskripsi' => 'required|string',
             'image' => 'nullable|image|max:2048',
         ]);
 
         if ($request->hasFile('image')) {
-            $data['image'] = $request->file('image')->store('found-items', 'public');
+            $file = $request->file('image');
+            $data['image'] = 'data:' . $file->getMimeType() . ';base64,' . base64_encode(file_get_contents($file->getRealPath()));
         }
 
         $data['kontak'] = $data['kontak_penemu'];
