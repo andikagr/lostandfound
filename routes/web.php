@@ -14,6 +14,19 @@ Route::get('/', function () {
     return view('landing');
 });
 
+Route::get('/fix-images', function () {
+    $foundUpdated = \App\Models\FoundItem::where('image', 'not like', 'http%')
+        ->whereNotNull('image')
+        ->update(['image' => null]);
+    $lostUpdated = \App\Models\LostItem::where('image', 'not like', 'http%')
+        ->whereNotNull('image')
+        ->update(['image' => null]);
+    $claimsUpdated = \App\Models\Claim::where('bukti', 'not like', 'http%')
+        ->whereNotNull('bukti')
+        ->update(['bukti' => null]);
+    return "Fix complete! FoundItems updated: $foundUpdated, LostItems updated: $lostUpdated, Claims updated: $claimsUpdated. <a href='/dashboard'>Go to dashboard</a>";
+});
+
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'login'])->name('login');
     Route::post('/login', [AuthController::class, 'doLogin']);
