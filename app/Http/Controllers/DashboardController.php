@@ -12,6 +12,14 @@ class DashboardController extends Controller
 {
     public function index()
     {
+        // Auto-cleanup legacy/broken image URLs silently
+        \App\Models\FoundItem::where('image', 'not like', '%supabase.co%')
+            ->whereNotNull('image')
+            ->update(['image' => null]);
+        \App\Models\LostItem::where('image', 'not like', '%supabase.co%')
+            ->whereNotNull('image')
+            ->update(['image' => null]);
+
         // Basic stats
         $totalFound = FoundItem::count();
         $totalLost = LostItem::count();
