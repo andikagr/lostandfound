@@ -39,7 +39,7 @@
                         <td>{{ $i + 1 }}</td>
                         <td style="text-align:center;">
                             @if($item->image)
-                                <img src="{{ asset('storage/' . $item->image) }}" width="80" style="object-fit:cover;">
+                                <img src="{{ (str_starts_with($item->image, 'http') ? $item->image : asset('storage/' . $item->image)) }}" width="80" style="object-fit:cover;">
                             @else
                                 -
                             @endif

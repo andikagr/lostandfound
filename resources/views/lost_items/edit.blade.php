@@ -14,7 +14,7 @@
                 {{-- IMAGE --}}
                 <div class="col-md-4">
                     <div class="border mb-2" style="height:200px;">
-                        <img src="{{ $item->image ? asset('storage/'.$item->image) : 'https://via.placeholder.com/300x200?text=No+Image' }}"
+                        <img src="{{ $item->image ? (str_starts_with($item->image, 'http') ? $item->image : asset('storage/' . $item->image)) : 'https://via.placeholder.com/300x200?text=No+Image' }}"
                              class="w-100 h-100"
                              style="object-fit:cover">
                     </div>

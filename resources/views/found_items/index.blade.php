@@ -99,7 +99,7 @@
                             <td class="text-center fw-semibold text-muted">{{ $i + 1 }}</td>
                             <td>
                                 <div class="bg-light rounded" style="width: 80px; height: 80px; overflow: hidden;">
-                                    <img src="{{ $item->image ? asset('storage/' . $item->image) : 'https://via.placeholder.com/80' }}" 
+                                    <img src="{{ $item->image ? (str_starts_with($item->image, 'http') ? $item->image : asset('storage/' . $item->image)) : 'https://via.placeholder.com/80' }}" 
                                          class="w-100 h-100 object-fit-cover" 
                                          alt="{{ $item->nama_barang }}">
                                 </div>

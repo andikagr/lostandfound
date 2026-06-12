@@ -92,7 +92,7 @@
                             <td class="text-center">
                                 <div class="bg-light rounded mx-auto" style="width: 80px; height: 80px; overflow: hidden;">
                                     @if($item->image)
-                                        <img src="{{ asset('storage/'.$item->image) }}"
+                                        <img src="{{ (str_starts_with($item->image, 'http') ? $item->image : asset('storage/' . $item->image)) }}"
                                              class="w-100 h-100 object-fit-cover"
                                              alt="{{ $item->nama_barang }}"
                                              onerror="this.onerror=null;this.src='https://via.placeholder.com/80?text=No+Img';">

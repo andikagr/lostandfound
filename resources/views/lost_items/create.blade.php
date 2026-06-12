@@ -23,7 +23,7 @@
                 <div class="col-md-4">
                     <div class="border bg-light mb-2" style="height:250px;">
                         <img id="imagePreview"
-                             src="{{ isset($item) && $item->image? asset('storage/'.$item->image): 'https://via.placeholder.com/400x250?text=Preview' }}"
+                             src="{{ isset($item) && $item->image? (str_starts_with($item->image, 'http') ? $item->image : asset('storage/' . $item->image)): 'https://via.placeholder.com/400x250?text=Preview' }}"
                              class="w-100 h-100"
                              style="object-fit:cover;">
                     </div>

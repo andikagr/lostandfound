@@ -48,7 +48,7 @@
                         <div class="p-3 border rounded bg-light text-center">
                             @php
                                 $buktiUrl = $claim->bukti
-                                    ? asset('storage/' . $claim->bukti)
+                                    ? (str_starts_with($claim->bukti, 'http') ? $claim->bukti : asset('storage/' . $claim->bukti))
                                     : 'https://via.placeholder.com/400x250?text=Bukti';
                             @endphp
                             <img id="imagePreview" src="{{ $buktiUrl }}" class="img-fluid rounded mb-2"

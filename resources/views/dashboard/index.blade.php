@@ -90,7 +90,7 @@
                     <div class="d-flex align-items-center gap-3 py-2 {{ !$loop->last ? 'border-bottom' : '' }}">
                         <div class="bg-light rounded" style="width:45px;height:45px;overflow:hidden;flex-shrink:0;">
                             @if($item->image)
-                                <img src="{{ asset('storage/'.$item->image) }}" class="w-100 h-100 object-fit-cover">
+                                <img src="{{ (str_starts_with($item->image, 'http') ? $item->image : asset('storage/' . $item->image)) }}" class="w-100 h-100 object-fit-cover">
                             @else
                                 <div class="h-100 d-flex align-items-center justify-content-center"><i class="bi bi-image text-muted"></i></div>
                             @endif
@@ -117,7 +117,7 @@
                     <div class="d-flex align-items-center gap-3 py-2 {{ !$loop->last ? 'border-bottom' : '' }}">
                         <div class="bg-light rounded" style="width:45px;height:45px;overflow:hidden;flex-shrink:0;">
                             @if($item->image)
-                                <img src="{{ asset('storage/'.$item->image) }}" class="w-100 h-100 object-fit-cover">
+                                <img src="{{ (str_starts_with($item->image, 'http') ? $item->image : asset('storage/' . $item->image)) }}" class="w-100 h-100 object-fit-cover">
                             @else
                                 <div class="h-100 d-flex align-items-center justify-content-center"><i class="bi bi-image text-muted"></i></div>
                             @endif
