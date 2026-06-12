@@ -15,13 +15,13 @@ Route::get('/', function () {
 });
 
 Route::get('/fix-images', function () {
-    $foundUpdated = \App\Models\FoundItem::where('image', 'not like', 'http%')
+    $foundUpdated = \App\Models\FoundItem::where('image', 'not like', '%supabase.co%')
         ->whereNotNull('image')
         ->update(['image' => null]);
-    $lostUpdated = \App\Models\LostItem::where('image', 'not like', 'http%')
+    $lostUpdated = \App\Models\LostItem::where('image', 'not like', '%supabase.co%')
         ->whereNotNull('image')
         ->update(['image' => null]);
-    $claimsUpdated = \App\Models\Claim::where('bukti', 'not like', 'http%')
+    $claimsUpdated = \App\Models\Claim::where('bukti', 'not like', '%supabase.co%')
         ->where('bukti', '!=', '')
         ->update(['bukti' => '']);
     return "Fix complete! FoundItems updated: $foundUpdated, LostItems updated: $lostUpdated, Claims updated: $claimsUpdated. <a href='/dashboard'>Go to dashboard</a>";
