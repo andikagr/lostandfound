@@ -41,7 +41,7 @@ class ClaimController extends Controller
             'nama_pemilik'   => 'required|string|max:255',
             'kontak_pemilik' => 'required|string|max:255',
             'lokasi_terakhir'=> 'required|string|max:255',
-            'bukti'          => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048',
+            'bukti'          => 'required|file|mimes:jpg,jpeg,png,pdf|max:5120',
         ]);
 
         $data['user_id'] = Auth::id();
@@ -117,7 +117,7 @@ class ClaimController extends Controller
             'nama_pemilik'   => 'required|string|max:255',
             'kontak_pemilik' => 'required|string|max:255',
             'lokasi_terakhir'=> 'required|string|max:255',
-            'bukti'          => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
+            'bukti'          => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5120',
         ]);
 
         if ($request->hasFile('bukti')) {

@@ -22,8 +22,8 @@ Route::get('/fix-images', function () {
         ->whereNotNull('image')
         ->update(['image' => null]);
     $claimsUpdated = \App\Models\Claim::where('bukti', 'not like', 'http%')
-        ->whereNotNull('bukti')
-        ->update(['bukti' => null]);
+        ->where('bukti', '!=', '')
+        ->update(['bukti' => '']);
     return "Fix complete! FoundItems updated: $foundUpdated, LostItems updated: $lostUpdated, Claims updated: $claimsUpdated. <a href='/dashboard'>Go to dashboard</a>";
 });
 

@@ -61,7 +61,7 @@ class LostItemController extends Controller
             'kontak'         => 'required|string',
             'lokasi_terakhir'=> 'required|string',
             'deskripsi'      => 'required|string',
-            'image'          => 'nullable|image|mimes:jpg,jpeg,png|max:1024',
+            'image'          => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
         ]);
 
         $data['status_id'] = 1;
@@ -110,7 +110,7 @@ class LostItemController extends Controller
             'tanggal_hilang' => 'required|date',
             'kontak'         => 'required|string',
             'deskripsi'      => 'required|string',
-            'image'          => 'nullable|image|mimes:jpg,jpeg,png|max:1024',
+            'image'          => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
             'status_id'      => 'nullable|integer',
         ]);
 

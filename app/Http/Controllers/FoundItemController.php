@@ -85,7 +85,7 @@ class FoundItemController extends Controller
             'alamat_penemu'   => 'nullable|string|max:255',
             'kontak'          => 'nullable|string|max:255',
             'deskripsi'       => 'nullable|string',
-            'image'           => 'nullable|image|max:1024',
+            'image'           => 'nullable|image|max:5120',
         ]);
 
         if ($request->hasFile('image')) {

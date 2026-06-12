@@ -33,7 +33,7 @@ class FormFoundItemController extends Controller
             'kontak_penemu'    => 'required|string|max:255',
             'alamat_penemu'    => 'required|string|max:255',
             'deskripsi'        => 'required|string',
-            'image'            => 'nullable|image|max:1024',
+            'image'            => 'nullable|image|max:5120',
         ]);
 
         if ($request->hasFile('image')) {

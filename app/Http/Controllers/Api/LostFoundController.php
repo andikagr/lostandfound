@@ -27,7 +27,7 @@ class LostFoundController extends Controller
             'tanggal_hilang' => 'required|date',
             'deskripsi' => 'required|string',
             'kontak' => 'required|string|max:255',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
         ]);
 
         if ($validator->fails()) {
@@ -94,7 +94,7 @@ class LostFoundController extends Controller
             'tanggal_hilang' => 'sometimes|required|date',
             'deskripsi' => 'sometimes|required|string',
             'kontak' => 'sometimes|required|string|max:255',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
         ]);
 
         if ($validator->fails()) return response()->json(['errors' => $validator->errors()], 422);
@@ -143,7 +143,7 @@ class LostFoundController extends Controller
             'alamat_penemu' => 'required|string|max:255',
             'kontak' => 'required|string|max:255',
             'deskripsi' => 'required|string',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
         ]);
 
         if ($validator->fails()) return response()->json(['errors' => $validator->errors()], 422);
@@ -192,7 +192,7 @@ class LostFoundController extends Controller
             'alamat_penemu' => 'required|string|max:255',
             'kontak' => 'required|string|max:255',
             'deskripsi' => 'required|string',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
         ]);
 
         if ($validator->fails()) return response()->json(['errors' => $validator->errors()], 422);
@@ -235,7 +235,7 @@ class LostFoundController extends Controller
             'nama_pemilik' => 'required|string',
             'kontak_pemilik' => 'required|string',
             'lokasi_terakhir' => 'required|string',
-            'bukti' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+            'bukti' => 'required|image|mimes:jpeg,png,jpg|max:5120',
         ]);
 
         if ($validator->fails()) return response()->json(['errors' => $validator->errors()], 422);
@@ -269,7 +269,7 @@ class LostFoundController extends Controller
             'nama_pemilik' => 'required|string',
             'kontak_pemilik' => 'required|string',
             'lokasi_terakhir' => 'required|string',
-            'bukti' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'bukti' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
         ]);
 
         if ($validator->fails()) return response()->json(['errors' => $validator->errors()], 422);

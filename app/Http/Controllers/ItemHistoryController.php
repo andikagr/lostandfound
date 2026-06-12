@@ -67,7 +67,7 @@ class ItemHistoryController extends Controller
             'tanggal_hilang' => 'required|date',
             'deskripsi'      => 'nullable|string',
             'kontak'         => 'required|string',
-            'image'          => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
+            'image'          => 'nullable|image|mimes:jpeg,png,jpg|max:5120'
         ]);
 
         $validated['user_id'] = auth()->id();
@@ -97,7 +97,7 @@ class ItemHistoryController extends Controller
             'tanggal_hilang' => 'required|date',
             'deskripsi'      => 'nullable|string',
             'kontak'         => 'required|string',
-            'image'          => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
+            'image'          => 'nullable|image|mimes:jpeg,png,jpg|max:5120'
         ]);
 
         if ($request->hasFile('image')) {
