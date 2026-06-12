@@ -12,7 +12,7 @@
         {{-- Foto --}}
         <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height:220px; overflow:hidden;">
             @if($item->image)
-                <img src="{{ (str_starts_with($item->image, 'http') ? $item->image : asset('storage/' . $item->image)) }}" class="w-100 h-100" style="object-fit:cover;">
+                <img src="{{ (str_starts_with($item->image, 'http') ? $item->image : asset('storage/' . $item->image)) }}" class="w-100 h-100" style="object-fit:cover;" onerror="this.onerror=null;this.src='https://via.placeholder.com/300x200?text=No+Image';">
             @else
                 <div class="text-center text-secondary">
                     <i class="bi bi-image" style="font-size:2.5rem;"></i><br>

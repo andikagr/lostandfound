@@ -21,7 +21,7 @@
         <div class="col-md-5 col-lg-4 bg-light position-relative">
             <div class="w-100 h-100 d-flex align-items-center justify-content-center" style="min-height: 400px;">
                 @if($item->image)
-                    <img src="{{ (str_starts_with($item->image, 'http') ? $item->image : asset('storage/' . $item->image)) }}" class="w-100 h-100 object-fit-cover position-absolute top-0 start-0" alt="{{ $item->nama_barang }}">
+                    <img src="{{ (str_starts_with($item->image, 'http') ? $item->image : asset('storage/' . $item->image)) }}" class="w-100 h-100 object-fit-cover position-absolute top-0 start-0" alt="{{ $item->nama_barang }}" onerror="this.onerror=null;this.src='https://via.placeholder.com/300x200?text=No+Image';">
                 @else
                     <div class="text-center text-muted">
                         <i class="bi bi-image" style="font-size: 4rem; opacity: 0.5;"></i>

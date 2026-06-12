@@ -25,7 +25,7 @@
                                     $item = $claim->foundItem ?? $claim->lostItem;
                                 @endphp
                                 @if($item && $item->image)
-                                    <img src="{{ (str_starts_with($item->image, 'http') ? $item->image : asset('storage/' . $item->image)) }}" class="w-100 h-100 object-fit-cover">
+                                    <img src="{{ (str_starts_with($item->image, 'http') ? $item->image : asset('storage/' . $item->image)) }}" class="w-100 h-100 object-fit-cover" onerror="this.onerror=null;this.src='https://via.placeholder.com/80?text=No+Img';">
                                 @else
                                     <div class="h-100 d-flex flex-column align-items-center justify-content-center text-muted small">
                                         <i class="bi bi-image fs-2 mb-2"></i>
