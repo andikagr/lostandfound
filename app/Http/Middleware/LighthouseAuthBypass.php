@@ -4,23 +4,21 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Auth\Middleware\Authenticate as Middleware;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 
-class LighthouseAuthBypass
+class LighthouseAuthBypass extends Middleware
 {
     /**
      * Handle an incoming request.
-     *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle(Request $request, Closure $next): Response
+    public function handle($request, Closure $next, ...$guards)
     {
-        $userAgent = $request->header('User-Agent');
+        $userAgent = $request->header('User-Agent', '');
 
-        // Check if the user agent belongs to PageSpeed Insights (Lighthouse)
-        if ($userAgent && str_contains($userAgent, 'Chrome-Lighthouse')) {
+        // Broaden the check for PageSpeed Insights, Lighthouse, Googlebot, etc.
+        if (preg_match('/Lighthouse|Googlebot|Page Speed|PTST/i', $userAgent)) {
             // Bypass auth by temporarily logging in the first available user
             if (!Auth::check()) {
                 $user = User::first();
@@ -31,6 +29,6 @@ class LighthouseAuthBypass
             return $next($request);
         }
 
-        return $next($request);
+        return parent::handle($request, $next, ...$guards);
     }
 }
