@@ -43,11 +43,20 @@ class SupabaseStorageService
 
         $response = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curlError = curl_error($ch);
         curl_close($ch);
 
-        if ($httpCode === 200 || $httpCode === 200) {
+        if ($httpCode === 200 || $httpCode === 201) {
             return "{$this->projectUrl}/storage/v1/object/public/{$this->bucket}/{$filename}";
         }
+
+        // Log the error for debugging
+        \Illuminate\Support\Facades\Log::error('Supabase upload failed', [
+            'httpCode' => $httpCode,
+            'response' => $response,
+            'curlError' => $curlError,
+            'keyLength' => strlen($this->serviceKey),
+        ]);
 
         // Fallback: return null if upload failed
         return null;
