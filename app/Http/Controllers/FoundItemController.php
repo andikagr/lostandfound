@@ -20,9 +20,11 @@ class FoundItemController extends Controller
     public function index(Request $request)
     {
         // Auto-cleanup legacy/broken image URLs silently
-        \App\Models\FoundItem::where('image', 'not like', '%supabase.co%')
-            ->whereNotNull('image')
-            ->update(['image' => null]);
+        \App\Models\FoundItem::where(function ($q) {
+            $q->where('image', 'not like', '%supabase.co%')
+              ->orWhere('image', '');
+        })->whereNotNull('image')
+          ->update(['image' => null]);
 
         $query = FoundItem::query();
 

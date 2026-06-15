@@ -99,10 +99,16 @@
                             <td class="text-center fw-semibold text-muted">{{ $i + 1 }}</td>
                             <td>
                                 <div class="bg-light rounded" style="width: 80px; height: 80px; overflow: hidden;">
-                                    <img src="{{ $item->image ? (str_starts_with($item->image, 'http') ? $item->image : asset('storage/' . $item->image)) : 'https://via.placeholder.com/80' }}" 
-                                         class="w-100 h-100 object-fit-cover" 
-                                         alt="{{ $item->nama_barang }}"
-                                         onerror="this.onerror=null;this.src='https://via.placeholder.com/80?text=No+Img';">
+                                    @if($item->image && str_starts_with($item->image, 'http'))
+                                        <img src="{{ $item->image }}" 
+                                             class="w-100 h-100 object-fit-cover" 
+                                             alt="{{ $item->nama_barang }}"
+                                             onerror="this.onerror=null;this.parentElement.innerHTML='<div class=\'h-100 d-flex flex-column align-items-center justify-content-center text-muted small\'><i class=\'bi bi-image fs-4 mb-1\'></i></div>';">
+                                    @else
+                                        <div class="h-100 d-flex flex-column align-items-center justify-content-center text-muted small">
+                                            <i class="bi bi-image fs-4 mb-1"></i>
+                                        </div>
+                                    @endif
                                 </div>
                             </td>
                             <td>
